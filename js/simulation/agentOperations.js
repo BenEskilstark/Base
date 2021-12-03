@@ -51,12 +51,12 @@ const agentPickup = (
   if (agent.holdingIDs.length >= config.maxHold) return game;
 
   // update task need if agent not doing go_to_dirt picks up marked dirt
-  if (
-    agent.task != 'GO_TO_DIRT' && entity.type == 'DIRT' && entity.marked == agent.playerID &&
-    game.bases[agent.playerID].taskNeed['GO_TO_DIRT'] > 0
-  ) {
-    game.bases[agent.playerID].taskNeed['GO_TO_DIRT'] -= 1;
-  }
+  // if (
+  //   agent.task != 'GO_TO_DIRT' && entity.type == 'DIRT' && entity.marked == agent.playerID &&
+  //   game.bases[agent.playerID].taskNeed['GO_TO_DIRT'] > 0
+  // ) {
+  //   game.bases[agent.playerID].taskNeed['GO_TO_DIRT'] -= 1;
+  // }
 
   // do the actual pickup
   agent.holding = pickupEntity(game, entity, pickupPos);
@@ -77,11 +77,26 @@ const agentPutdown = (game: Game, agent: Agent): Game => {
     const occupied = lookupInGrid(game.grid, putDownPos)
       .map(id => game.entities[id])
       .filter(e => !e.notBlockingPutdown)
-      .length > 0;
-    if (occupied) continue;
+    let shouldLoad = false
+    let toLoad = null;
+    if (occupied.length > 0) {
+      if (!agent.LOADER) continue;
+      toLoad = occupied[0];
+      if (toLoad.holdingIDs.length >= toLoad.maxHold) continue;
+      shouldLoad = true;
+    }
     if (!insideGrid(game.grid, putDownPos)) continue;
 
+    const heldEntity = agent.holding;
     putdownEntity(game, agent.holding, putDownPos);
+
+    // suport transferring entity from agent (loader) to something else
+    if (shouldLoad) {
+      // see agentPickup above for this pasta
+      toLoad.holding = pickupEntity(game, heldEntity, putDownPos);
+      toLoad.holdingIDs.push(toLoad.holding.id);
+    }
+
     // allow holding more than 1 thing
     agent.holdingIDs.pop();
     if (agent.holdingIDs.length == 0) {

@@ -23,7 +23,10 @@ const {useEffect, useState, useMemo, Component, memo} = React;
 const {add, subtract} = require('../utils/vectors');
 const {lookupInGrid} = require('../utils/gridHelpers');
 const {clamp, isMobile} = require('../utils/helpers');
-const {getControlledEntityInteraction} = require('../selectors/misc');
+const {
+  getControlledEntityInteraction,
+  getManningAction,
+} = require('../selectors/misc');
 const {isActionTypeQueued} = require('../simulation/actionQueue');
 const {render} = require('../render/render');
 
@@ -159,6 +162,26 @@ function registerHotkeys(dispatch) {
       });
     }
   });
+
+  // manning:
+  dispatch({
+    type: 'SET_HOTKEY', press: 'onKeyDown',
+    key: 'M',
+    fn: (s) => {
+      const game = s.getState().game;
+      const controlledEntity = game.controlledEntity;
+      if (!controlledEntity) return;
+      const {entity, entityAction} = getManningAction(game);
+      if (entityAction) {
+        dispatch({
+          type: 'ENQUEUE_ENTITY_ACTION',
+          entity,
+          entityAction,
+        });
+      }
+    }
+  });
+
   dispatch({
     type: 'SET_HOTKEY', press: 'onKeyDown',
     key: 'up',

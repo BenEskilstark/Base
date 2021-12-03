@@ -155,6 +155,38 @@ const getControlledEntityInteraction = (game: Game, agent: Agent): EntityAction 
   return makeAction(game, agent, 'PICKUP', {pickup: null, position: positionsInFront[0]});
 };
 
+const getManningAction = (game: Game): EntityAction => {
+  const controlledEntity = game.controlledEntity;
+  let entityAction = null;
+  let entity = controlledEntity;
+  if (!controlledEntity.MANNED) {
+    let entityToMan = null;
+
+    const positionsInFront = getPositionsInFront(game, controlledEntity);
+    // PICKUP if there's something to pick up
+    for (const pos of positionsInFront) {
+      const couldMan = lookupInGrid(game.grid, pos)
+        .map(id => game.entities[id])
+        .filter(e => e.MANNED)
+        [0];
+      if (couldMan) {
+        entityToMan = couldMan;
+        break;
+      }
+    }
+    if (entityToMan) {
+      entityAction = makeAction(game, controlledEntity, 'MAN', entityToMan);
+    }
+  }
+
+  if (controlledEntity.MANNED && controlledEntity.riders.length > 0) {
+    entityAction = makeAction(game, controlledEntity.riders[0], 'UN_MAN', controlledEntity);
+    entity = controlledEntity.riders[0];
+  }
+
+  return {entity, entityAction};
+};
+
 
 
 module.exports = {
@@ -164,4 +196,5 @@ module.exports = {
   isFacing,
   canDoMove,
   getControlledEntityInteraction,
+  getManningAction,
 };

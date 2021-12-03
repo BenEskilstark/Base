@@ -589,13 +589,13 @@ function registerHotkeys(dispatch, editor, setEditor) {
   //     setEditor({...editor, version: editor.version + 1});
   //   }
   // });
-  dispatch({
-    type: 'SET_HOTKEY', press: 'onKeyDown',
-    key: 'M',
-    fn: (s) => {
-      dispatch({type: 'TICK'});
-    }
-  });
+  // dispatch({
+  //   type: 'SET_HOTKEY', press: 'onKeyDown',
+  //   key: 'M',
+  //   fn: (s) => {
+  //     dispatch({type: 'TICK'});
+  //   }
+  // });
   dispatch({
     type: 'SET_HOTKEY', press: 'onKeyDown',
     key: 'J',
@@ -672,6 +672,7 @@ function createEntities(game, dispatch, editor, rect): void {
     case 'SOLAR_PANEL':
     case 'TURBINE':
     case 'AGENT':
+    case 'PLAYER':
     case 'BASE':
       args = [editor.playerID];
       break;
@@ -716,6 +717,11 @@ function createEntities(game, dispatch, editor, rect): void {
       break;
     case 'TOKEN':
       args = [editor.playerID, editor.pheromoneType];
+      break;
+    case 'BULLDOZER':
+    case 'DRILL':
+    case 'DUMPTRUCK':
+      args = [];
       break;
     default:
       console.error("no entity palette for ", editor.entityType);

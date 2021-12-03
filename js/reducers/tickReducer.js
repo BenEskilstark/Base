@@ -109,6 +109,9 @@ const doTick = (game: Game): Game => {
   if (game.time == 45) {
     game.focusedEntity = null;
   }
+  if (game.time > 45 && game.controlledEntity == null) {
+    game.controlledEntity = game.entities[game.PLAYER[0]];
+  }
 
   // game/frame timing
   game.timeSinceLastTick = curTickTime - game.prevTickTime;

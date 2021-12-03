@@ -14,15 +14,17 @@ const {
   getPositionsInFront, getPositionsBehind, isFacing,
   canDoMove,
 } = require('../selectors/misc');
+const {collidesWith} = require('../selectors/collisions');
 const {
   addEntity, removeEntity, moveEntity, pickupEntity, putdownEntity,
-  rotateEntity, changeEntityType,
+  rotateEntity, changeEntityType, removeEntityFromGrid,
   addSegmentToEntity,
 } = require('../simulation/entityOperations');
 const {
   agentPutdown, agentPickup,
 } = require('../simulation/agentOperations');
 const {triggerExplosion} = require('../simulation/explosiveOperations');
+const {dealDamageToEntity} = require('../simulation/miscOperations');
 const {Entities} = require('../entities/registry');
 
 
@@ -72,6 +74,12 @@ const entityStartCurrentAction = (
       break;
     case 'COOLDOWN':
       break;
+    case 'MAN':
+      entityMan(game, entity, curAction.payload);
+      break;
+    case 'UN_MAN':
+      entityUnMan(game, entity, curAction.payload);
+      break;
   }
 };
 
@@ -96,6 +104,16 @@ const agentDoMove = (game: Game, entity: Entity, nextPos: Vector): boolean => {
     if (!isFacing(entity, nextPos)) {
       stackAction(game, entity, makeAction(game, entity, 'TURN', nextTheta));
       entityStartCurrentAction(game, entity);
+    } else if (entity.RAM) {
+      console.log("RAM", entity.position, nextPos);
+      // if entity has the RAM property, then deal damage to the collisions
+      const collisions = collidesWith(game, {...entity, position: nextPos}, entity.blockingTypes);
+      const alreadyDamaged = {};
+      collisions.forEach(e => {
+        if (alreadyDamaged[e.id]) return;
+        alreadyDamaged[e.id] = true;
+        dealDamageToEntity(game, e, entity.damage);
+      });
     }
     return false;
   }
@@ -168,6 +186,45 @@ const entityDie = (game: Game, entity: Entity): void => {
   }
 
   removeEntity(game, entity);
+};
+
+const entityMan = (game: Game, entity: Entity, mannedEntity: Entity): void => {
+  if (!mannedEntity.MANNED) return;
+  pickupEntity(game: Game, entity, entity.position);
+  mannedEntity.riders.push(entity);
+
+  // transfer control:
+  if (game.controlledEntity != null && game.controlledEntity.id == entity.id) {
+    game.controlledEntity = mannedEntity;
+  }
+  if (game.focusedEntity != null && game.focusedEntity.id == entity.id) {
+    game.focusedEntity = mannedEntity;
+  }
+};
+
+const entityUnMan = (game: Game, entity: Entity, mannedEntity: Entity): void => {
+  const nextRiders = [];
+  let wasRiding = false;
+  for (const rider of mannedEntity.riders) {
+    if (rider.id != entity.id) {
+      nextRiders.push(rider);
+    } else {
+      wasRiding = true;
+    }
+  }
+  mannedEntity.riders = nextRiders;
+
+  if (wasRiding) {
+    putdownEntity(game, entity, add(mannedEntity.position, {x:-1, y: -1}));
+  }
+
+  // transfer control back:
+  if (game.controlledEntity != null && game.controlledEntity.id == mannedEntity.id) {
+    game.controlledEntity = entity;
+  }
+  if (game.focusedEntity != null && game.focusedEntity.id == mannedEntity.id) {
+    game.focusedEntity = entity;
+  }
 };
 
 

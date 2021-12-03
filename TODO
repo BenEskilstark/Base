@@ -1,12 +1,10 @@
 
 - - - - - - - FIX - - - - - - - -
-  - get focusedEntity to actually smoothly follow
   - remove TURBINE from pheromoneWorker
   - pheromoneWorker appears to not update after reset in level editor
 
 
 Game Engine Base Components:
-  - all entities should be stored as objects
   - config **
     - entity config shouldn't live on the entity, instead access
       static properties from the registry
@@ -16,8 +14,6 @@ Game Engine Base Components:
       - reducer, and queuing, cancelling, and performing actions
     - NEED a better system for spritesheet frames
       (perhaps go back to what antocracy uses)
-  - level editor
-     - re-render on arrowkeys when game is paused
   - loading levels
     - gotta be a better way, perhaps timetravel ***
   - sound

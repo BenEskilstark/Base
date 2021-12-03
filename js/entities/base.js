@@ -19,7 +19,7 @@ const config = {
 
   // need this for panning to focus on it
   MOVE: {
-    duration: 10,
+    duration: 45 * 4,
   },
 };
 

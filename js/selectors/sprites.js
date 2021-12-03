@@ -153,16 +153,6 @@ const getAntSpriteAndOffset = (game: Game, ant: Ant): Object => {
   let width = 32;
   let height = 32;
   let img = game.sprites.ANT;
-  if (ant.playerID != game.playerID) {
-    if (ant.playerID == 2) {
-      img = game.sprites.RED_ANT;
-    } else {
-      img = game.sprites.YELLOW_ANT;
-    }
-  } else if (ant.caste == 'YOUNG_QUEEN') {
-    img = game.sprites.YOUNG_QUEEN;
-    height = 64;
-  }
 
   const obj = {
     img,

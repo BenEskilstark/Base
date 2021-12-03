@@ -44,6 +44,20 @@ const Properties = {
 
   // entities that are collectable
   COLLECTABE: true,
+
+  // entities that deal damage to things they collide with
+  RAM: true,
+
+  // entities that can have other entities riding them
+  MANNED: true,
+
+  // entities that can drop held entities into other entities
+  // TODO:
+  //  - allow bulldozer, etc. to pick up until at maxHold
+  //  - allow bulldozer to put down all at once, or put down next to other entities
+  //  - allow loaders to pick up out of the heldIDs of other entities
+  //  - customize how held entities are rendered for each entity
+  LOADER: true,
 };
 
 module.exports = {

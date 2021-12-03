@@ -539,7 +539,7 @@ var spriteRenderFn = function spriteRenderFn(ctx, game, ant) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../render/renderAgent":28,"../selectors/sprites":34,"../utils/vectors":41,"./makeEntity":15}],3:[function(require,module,exports){
+},{"../render/renderAgent":32,"../selectors/sprites":38,"../utils/vectors":45,"./makeEntity":18}],3:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -576,7 +576,7 @@ var render = function render(ctx, game, bg) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],4:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],4:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -597,7 +597,7 @@ var config = {
 
   // need this for panning to focus on it
   MOVE: {
-    duration: 10
+    duration: 45 * 4
   }
 };
 
@@ -615,7 +615,7 @@ var render = function render(ctx, game, base) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"./makeEntity":15}],5:[function(require,module,exports){
+},{"../config":1,"./makeEntity":18}],5:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -747,7 +747,106 @@ var render = function render(ctx, game, turret) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../render/renderAgent":28,"../utils/vectors":41,"./makeEntity.js":15}],6:[function(require,module,exports){
+},{"../render/renderAgent":32,"../utils/vectors":45,"./makeEntity.js":18}],6:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _require = require('./makeEntity'),
+    makeEntity = _require.makeEntity;
+
+var _require2 = require('../selectors/sprites'),
+    getAntSpriteAndOffset = _require2.getAntSpriteAndOffset;
+
+var _require3 = require('../render/renderAgent'),
+    renderAgent = _require3.renderAgent;
+
+var config = {
+  hp: 200,
+  damage: 1,
+  width: 2,
+  height: 2,
+  maxHold: 2,
+  age: 0,
+
+  AGENT: true,
+  MANNED: true, // property where you can have a player ride
+  LOADER: true, // property where you can drop things into entities that hold stuff
+
+  pickupTypes: ['FOOD', 'DIRT', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+  blockingTypes: ['FOOD', 'DIRT', 'AGENT', 'STONE', 'DOODAD', 'WORM', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+
+  // action params
+  MOVE: {
+    duration: 41 * 6,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  MOVE_TURN: {
+    duration: 41 * 8,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  TURN: {
+    duration: 41 * 10,
+    spriteOrder: [1, 2, 3, 4]
+  },
+  DIE: {
+    duration: 41 * 2,
+    spriteOrder: [8]
+  }
+};
+
+var make = function make(game, position) {
+  var player = _extends({}, makeEntity('BULLDOZER', position, config.width, config.height), config, {
+    prevHP: config.hp,
+    prevHPAge: 0,
+    actions: [],
+    riders: [],
+
+    holding: null,
+    holdingIDs: [], // treat holding like a stack
+
+    // this frame offset allows iterating through spritesheets across
+    // multiple actions (rn only used by queen ant doing one full walk
+    // cycle across two MOVE actions)
+    frameOffset: 0,
+    timeOnMove: 0 // for turning in place
+  });
+
+  return player;
+};
+
+var render = function render(ctx, game, agent) {
+  renderAgent(ctx, game, agent, spriteRenderFn);
+};
+
+var spriteRenderFn = function spriteRenderFn(ctx, game, drill) {
+  var width = drill.width,
+      height = drill.height;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "yellow";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeRect(0, 0, width, height);
+  ctx.restore();
+
+  // const sprite = getAntSpriteAndOffset(game, ant);
+  // if (sprite.img != null) {
+  //   ctx.drawImage(
+  //     sprite.img, sprite.x, sprite.y, sprite.width, sprite.height,
+  //     0, 0, ant.width, ant.height,
+  //   );
+  // }
+};
+
+module.exports = {
+  config: config, make: make, render: render
+};
+},{"../render/renderAgent":32,"../selectors/sprites":38,"./makeEntity":18}],7:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -823,7 +922,7 @@ var render = function render(ctx, game, bullet) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"../selectors/sprites":34,"../simulation/actionQueue":35,"../utils/vectors":41,"./makeEntity":15}],7:[function(require,module,exports){
+},{"../config":1,"../selectors/sprites":38,"../simulation/actionQueue":39,"../utils/vectors":45,"./makeEntity":18}],8:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -865,7 +964,7 @@ var render = function render(ctx, game, coal) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],8:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],9:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -905,7 +1004,7 @@ var render = function render(ctx, game, dirt) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],9:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],10:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -936,7 +1035,200 @@ var render = function render(ctx, game, doodad) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"./makeEntity":15}],10:[function(require,module,exports){
+},{"./makeEntity":18}],11:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _require = require('./makeEntity'),
+    makeEntity = _require.makeEntity;
+
+var _require2 = require('../selectors/sprites'),
+    getAntSpriteAndOffset = _require2.getAntSpriteAndOffset;
+
+var _require3 = require('../render/renderAgent'),
+    renderAgent = _require3.renderAgent;
+
+var config = {
+  hp: 200,
+  damage: 1,
+  width: 2,
+  height: 2,
+  age: 0,
+
+  AGENT: true,
+  RAM: true, // property where you deal damage to things you collide with
+  MANNED: true, // property where you can have a player ride
+
+  blockingTypes: ['FOOD', 'DIRT', 'AGENT', 'STONE', 'DOODAD', 'WORM', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+
+  // action params
+  MOVE: {
+    duration: 41 * 8,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  MOVE_TURN: {
+    duration: 41 * 10,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  TURN: {
+    duration: 41 * 12,
+    spriteOrder: [1, 2, 3, 4]
+  },
+  DIE: {
+    duration: 41 * 2,
+    spriteOrder: [8]
+  }
+};
+
+var make = function make(game, position) {
+  var player = _extends({}, makeEntity('DRILL', position, config.width, config.height), config, {
+    prevHP: config.hp,
+    prevHPAge: 0,
+    actions: [],
+    riders: [],
+
+    // this frame offset allows iterating through spritesheets across
+    // multiple actions (rn only used by queen ant doing one full walk
+    // cycle across two MOVE actions)
+    frameOffset: 0,
+    timeOnMove: 0 // for turning in place
+  });
+
+  return player;
+};
+
+var render = function render(ctx, game, agent) {
+  renderAgent(ctx, game, agent, spriteRenderFn);
+};
+
+var spriteRenderFn = function spriteRenderFn(ctx, game, drill) {
+  var width = drill.width,
+      height = drill.height;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "steelblue";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeRect(0, 0, width, height);
+  ctx.restore();
+
+  // const sprite = getAntSpriteAndOffset(game, ant);
+  // if (sprite.img != null) {
+  //   ctx.drawImage(
+  //     sprite.img, sprite.x, sprite.y, sprite.width, sprite.height,
+  //     0, 0, ant.width, ant.height,
+  //   );
+  // }
+};
+
+module.exports = {
+  config: config, make: make, render: render
+};
+},{"../render/renderAgent":32,"../selectors/sprites":38,"./makeEntity":18}],12:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _require = require('./makeEntity'),
+    makeEntity = _require.makeEntity;
+
+var _require2 = require('../selectors/sprites'),
+    getAntSpriteAndOffset = _require2.getAntSpriteAndOffset;
+
+var _require3 = require('../render/renderAgent'),
+    renderAgent = _require3.renderAgent;
+
+var config = {
+  hp: 200,
+  damage: 1,
+  width: 3,
+  height: 3,
+  maxHold: 9,
+  age: 0,
+
+  AGENT: true,
+  MANNED: true, // property where you can have a player ride
+  LOADER: true, // can load held entities into other entities
+
+  pickupTypes: ['FOOD', 'DIRT', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+  blockingTypes: ['FOOD', 'DIRT', 'AGENT', 'STONE', 'DOODAD', 'WORM', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+
+  // action params
+  MOVE: {
+    duration: 41 * 6,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  MOVE_TURN: {
+    duration: 41 * 8,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  TURN: {
+    duration: 41 * 10,
+    spriteOrder: [1, 2, 3, 4]
+  },
+  DIE: {
+    duration: 41 * 2,
+    spriteOrder: [8]
+  }
+};
+
+var make = function make(game, position) {
+  var player = _extends({}, makeEntity('DUMPTRUCK', position, config.width, config.height), config, {
+    prevHP: config.hp,
+    prevHPAge: 0,
+    actions: [],
+    riders: [],
+
+    holding: null,
+    holdingIDs: [], // treat holding like a stack
+
+    // this frame offset allows iterating through spritesheets across
+    // multiple actions (rn only used by queen ant doing one full walk
+    // cycle across two MOVE actions)
+    frameOffset: 0,
+    timeOnMove: 0 // for turning in place
+  });
+
+  return player;
+};
+
+var render = function render(ctx, game, agent) {
+  renderAgent(ctx, game, agent, spriteRenderFn);
+};
+
+var spriteRenderFn = function spriteRenderFn(ctx, game, drill) {
+  var width = drill.width,
+      height = drill.height;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "gray";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeRect(0, 0, width, height);
+  ctx.restore();
+
+  // const sprite = getAntSpriteAndOffset(game, ant);
+  // if (sprite.img != null) {
+  //   ctx.drawImage(
+  //     sprite.img, sprite.x, sprite.y, sprite.width, sprite.height,
+  //     0, 0, ant.width, ant.height,
+  //   );
+  // }
+};
+
+module.exports = {
+  config: config, make: make, render: render
+};
+},{"../render/renderAgent":32,"../selectors/sprites":38,"./makeEntity":18}],13:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1008,7 +1300,7 @@ var render = function render(ctx, game, dynamite) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"../selectors/sprites":34,"../simulation/actionQueue":35,"./makeEntity":15}],11:[function(require,module,exports){
+},{"../config":1,"../selectors/sprites":38,"../simulation/actionQueue":39,"./makeEntity":18}],14:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1049,7 +1341,7 @@ var render = function render(ctx, game, food) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],12:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],15:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1092,7 +1384,7 @@ var render = function render(ctx, game, glass) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],13:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],16:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1134,7 +1426,7 @@ var render = function render(ctx, game, ice) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],14:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],17:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1174,7 +1466,7 @@ var render = function render(ctx, game, iron) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],15:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],18:[function(require,module,exports){
 'use strict';
 
 var makeEntity = function makeEntity(type, position, width, height) {
@@ -1193,7 +1485,7 @@ var makeEntity = function makeEntity(type, position, width, height) {
 module.exports = {
 	makeEntity: makeEntity
 };
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1291,7 +1583,7 @@ var render = function render(ctx, game, missile) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"../selectors/sprites":34,"../simulation/actionQueue":35,"../utils/vectors":41,"./makeEntity":15}],17:[function(require,module,exports){
+},{"../config":1,"../selectors/sprites":38,"../simulation/actionQueue":39,"../utils/vectors":45,"./makeEntity":18}],20:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1363,7 +1655,111 @@ var render = function render(ctx, game, dynamite) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"../selectors/sprites":34,"../simulation/actionQueue":35,"./makeEntity":15}],18:[function(require,module,exports){
+},{"../config":1,"../selectors/sprites":38,"../simulation/actionQueue":39,"./makeEntity":18}],21:[function(require,module,exports){
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _require = require('./makeEntity'),
+    makeEntity = _require.makeEntity;
+
+var _require2 = require('../selectors/sprites'),
+    getAntSpriteAndOffset = _require2.getAntSpriteAndOffset;
+
+var _require3 = require('../render/renderAgent'),
+    renderAgent = _require3.renderAgent;
+
+var config = {
+  hp: 60,
+  damage: 1,
+  width: 1,
+  height: 1,
+  maxHold: 1,
+  age: 0,
+
+  AGENT: true,
+  LOADER: true,
+
+  pickupTypes: ['FOOD', 'DIRT', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+  blockingTypes: ['FOOD', 'DIRT', 'AGENT', 'STONE', 'DOODAD', 'WORM', 'TOKEN', 'DYNAMITE', 'COAL', 'IRON', 'STEEL'],
+
+  // action params
+  MOVE: {
+    duration: 41 * 4,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  MAN: {
+    duration: 41 * 4,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  UN_MAN: {
+    duration: 41 * 4,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  MOVE_TURN: {
+    duration: 41 * 5,
+    spriteOrder: [1, 2],
+    maxFrameOffset: 2,
+    frameStep: 2
+  },
+  PICKUP: {
+    duration: 41 * 6,
+    spriteOrder: [5, 6, 7]
+  },
+  PUTDOWN: {
+    duration: 41 * 6,
+    spriteOrder: [7, 6, 5]
+  },
+  TURN: {
+    duration: 41 * 6,
+    spriteOrder: [1, 2, 3, 4]
+  },
+  DIE: {
+    duration: 41 * 2,
+    spriteOrder: [8]
+  }
+};
+
+var make = function make(game, position, playerID) {
+  var player = _extends({}, makeEntity('PLAYER', position, config.width, config.height), config, {
+    playerID: playerID,
+    prevHP: config.hp,
+    prevHPAge: 0,
+    holding: null,
+    holdingIDs: [], // treat holding like a stack
+    actions: [],
+
+    // this frame offset allows iterating through spritesheets across
+    // multiple actions (rn only used by queen ant doing one full walk
+    // cycle across two MOVE actions)
+    frameOffset: 0,
+    timeOnMove: 0 // for turning in place
+  });
+
+  return player;
+};
+
+var render = function render(ctx, game, agent) {
+  renderAgent(ctx, game, agent, spriteRenderFn);
+};
+
+var spriteRenderFn = function spriteRenderFn(ctx, game, ant) {
+  var sprite = getAntSpriteAndOffset(game, ant);
+  if (sprite.img != null) {
+    ctx.drawImage(sprite.img, sprite.x, sprite.y, sprite.width, sprite.height, 0, 0, ant.width, ant.height);
+  }
+};
+
+module.exports = {
+  config: config, make: make, render: render
+};
+},{"../render/renderAgent":32,"../selectors/sprites":38,"./makeEntity":18}],22:[function(require,module,exports){
 'use strict';
 
 var globalConfig = require('../config');
@@ -1396,6 +1792,11 @@ var Entities = {
   AGENT: require('./agent.js'),
   TOKEN: require('./token.js'),
 
+  PLAYER: require('./player.js'),
+  DRILL: require('./drill.js'),
+  BULLDOZER: require('./bulldozer.js'),
+  DUMPTRUCK: require('./dumptruck.js'),
+
   BASIC_TURRET: require('./basicTurret.js'),
   FAST_TURRET: require('./turret.js'),
 
@@ -1410,7 +1811,7 @@ var Entities = {
 module.exports = {
   Entities: Entities
 };
-},{"../config":1,"./agent.js":2,"./background.js":3,"./base.js":4,"./basicTurret.js":5,"./bullet.js":6,"./coal.js":7,"./dirt.js":8,"./doodad.js":9,"./dynamite.js":10,"./food.js":11,"./glass.js":12,"./ice.js":13,"./iron.js":14,"./missile.js":16,"./nuke.js":17,"./silicon.js":19,"./steel.js":20,"./stone.js":21,"./sulphur.js":22,"./token.js":23,"./turret.js":24,"./uranium.js":25}],19:[function(require,module,exports){
+},{"../config":1,"./agent.js":2,"./background.js":3,"./base.js":4,"./basicTurret.js":5,"./bulldozer.js":6,"./bullet.js":7,"./coal.js":8,"./dirt.js":9,"./doodad.js":10,"./drill.js":11,"./dumptruck.js":12,"./dynamite.js":13,"./food.js":14,"./glass.js":15,"./ice.js":16,"./iron.js":17,"./missile.js":19,"./nuke.js":20,"./player.js":21,"./silicon.js":23,"./steel.js":24,"./stone.js":25,"./sulphur.js":26,"./token.js":27,"./turret.js":28,"./uranium.js":29}],23:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1454,7 +1855,7 @@ var render = function render(ctx, game, silicon) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],20:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],24:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1494,7 +1895,7 @@ var render = function render(ctx, game, steel) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],21:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],25:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1528,7 +1929,7 @@ var render = function render(ctx, game, stone) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],22:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],26:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1562,7 +1963,7 @@ var render = function render(ctx, game, sulphur) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],23:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],27:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1599,7 +2000,7 @@ var render = function render(ctx, game, token) {
 };
 
 module.exports = { config: config, make: make, render: render };
-},{"../config":1,"./makeEntity":15}],24:[function(require,module,exports){
+},{"../config":1,"./makeEntity":18}],28:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1741,7 +2142,7 @@ var render = function render(ctx, game, turret) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../render/renderAgent":28,"../selectors/sprites":34,"../utils/vectors":41,"./makeEntity.js":15}],25:[function(require,module,exports){
+},{"../render/renderAgent":32,"../selectors/sprites":38,"../utils/vectors":45,"./makeEntity.js":18}],29:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -1779,7 +2180,7 @@ var render = function render(ctx, game, uranium) {
 module.exports = {
   make: make, render: render, config: config
 };
-},{"../selectors/sprites":34,"./makeEntity":15}],26:[function(require,module,exports){
+},{"../selectors/sprites":38,"./makeEntity":18}],30:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -2657,7 +3058,7 @@ var updateDispersingPheromones = function updateDispersingPheromones(game) {
   return nextDispersingPheromones;
 };
 
-},{"./config":1,"./selectors/neighbors":32,"./selectors/pheromones":33,"./simulation/entityOperations":36,"./simulation/pheromones":37,"./utils/gridHelpers":38,"./utils/helpers":39,"./utils/stochastic":40,"./utils/vectors":41}],27:[function(require,module,exports){
+},{"./config":1,"./selectors/neighbors":36,"./selectors/pheromones":37,"./simulation/entityOperations":40,"./simulation/pheromones":41,"./utils/gridHelpers":42,"./utils/helpers":43,"./utils/stochastic":44,"./utils/vectors":45}],31:[function(require,module,exports){
 'use strict';
 
 var _require = require('../entities/registry'),
@@ -2704,13 +3105,27 @@ var Properties = {
   TILED: true,
 
   // entities that are collectable
-  COLLECTABE: true
+  COLLECTABE: true,
+
+  // entities that deal damage to things they collide with
+  RAM: true,
+
+  // entities that can have other entities riding them
+  MANNED: true,
+
+  // entities that can drop held entities into other entities
+  // TODO:
+  //  - allow bulldozer, etc. to pick up until at maxHold
+  //  - allow bulldozer to put down all at once, or put down next to other entities
+  //  - allow loaders to pick up out of the heldIDs of other entities
+  //  - customize how held entities are rendered for each entity
+  LOADER: true
 };
 
 module.exports = {
   Properties: Properties
 };
-},{"../entities/registry":18}],28:[function(require,module,exports){
+},{"../entities/registry":22}],32:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/vectors'),
@@ -2802,7 +3217,7 @@ var renderAgent = function renderAgent(ctx, game, agent, spriteRenderFn) {
 };
 
 module.exports = { renderAgent: renderAgent };
-},{"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41,"./renderHealthBar":29}],29:[function(require,module,exports){
+},{"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45,"./renderHealthBar":33}],33:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/vectors'),
@@ -2844,7 +3259,7 @@ var renderHealthBar = function renderHealthBar(ctx, entity, maxHealth) {
 };
 
 module.exports = { renderHealthBar: renderHealthBar };
-},{"../utils/gridHelpers":38,"../utils/vectors":41}],30:[function(require,module,exports){
+},{"../utils/gridHelpers":42,"../utils/vectors":45}],34:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/gridHelpers'),
@@ -2908,7 +3323,7 @@ module.exports = {
   collidesWith: collidesWith,
   collisionsAtSpace: collisionsAtSpace
 };
-},{"../utils/gridHelpers":38}],31:[function(require,module,exports){
+},{"../utils/gridHelpers":42}],35:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -3093,15 +3508,71 @@ var getControlledEntityInteraction = function getControlledEntityInteraction(gam
   return makeAction(game, agent, 'PICKUP', { pickup: null, position: positionsInFront[0] });
 };
 
+var getManningAction = function getManningAction(game) {
+  var controlledEntity = game.controlledEntity;
+  var entityAction = null;
+  var entity = controlledEntity;
+  if (!controlledEntity.MANNED) {
+    var entityToMan = null;
+
+    var positionsInFront = getPositionsInFront(game, controlledEntity);
+    // PICKUP if there's something to pick up
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+      for (var _iterator2 = positionsInFront[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var pos = _step2.value;
+
+        var couldMan = lookupInGrid(game.grid, pos).map(function (id) {
+          return game.entities[id];
+        }).filter(function (e) {
+          return e.MANNED;
+        })[0];
+        if (couldMan) {
+          entityToMan = couldMan;
+          break;
+        }
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
+    }
+
+    if (entityToMan) {
+      entityAction = makeAction(game, controlledEntity, 'MAN', entityToMan);
+    }
+  }
+
+  if (controlledEntity.MANNED && controlledEntity.riders.length > 0) {
+    entityAction = makeAction(game, controlledEntity.riders[0], 'UN_MAN', controlledEntity);
+    entity = controlledEntity.riders[0];
+  }
+
+  return { entity: entity, entityAction: entityAction };
+};
+
 module.exports = {
   onScreen: onScreen,
   getPositionsInFront: getPositionsInFront,
   getPositionsBehind: getPositionsBehind,
   isFacing: isFacing,
   canDoMove: canDoMove,
-  getControlledEntityInteraction: getControlledEntityInteraction
+  getControlledEntityInteraction: getControlledEntityInteraction,
+  getManningAction: getManningAction
 };
-},{"../selectors/collisions":30,"../selectors/neighbors":32,"../simulation/actionQueue":35,"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41}],32:[function(require,module,exports){
+},{"../selectors/collisions":34,"../selectors/neighbors":36,"../simulation/actionQueue":39,"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45}],36:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -3368,7 +3839,7 @@ module.exports = {
   getFreeNeighborPositions: getFreeNeighborPositions,
   areNeighbors: areNeighbors
 };
-},{"../selectors/collisions":30,"../utils/gridHelpers":38,"../utils/vectors":41}],33:[function(require,module,exports){
+},{"../selectors/collisions":34,"../utils/gridHelpers":42,"../utils/vectors":45}],37:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/vectors'),
@@ -3550,7 +4021,7 @@ module.exports = {
   getQuantityForStalePos: getQuantityForStalePos,
   isPositionBlockingPheromone: isPositionBlockingPheromone
 };
-},{"../config":1,"../selectors/neighbors":32,"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41}],34:[function(require,module,exports){
+},{"../config":1,"../selectors/neighbors":36,"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45}],38:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/vectors'),
@@ -3727,16 +4198,6 @@ var getAntSpriteAndOffset = function getAntSpriteAndOffset(game, ant) {
   var width = 32;
   var height = 32;
   var img = game.sprites.ANT;
-  if (ant.playerID != game.playerID) {
-    if (ant.playerID == 2) {
-      img = game.sprites.RED_ANT;
-    } else {
-      img = game.sprites.YELLOW_ANT;
-    }
-  } else if (ant.caste == 'YOUNG_QUEEN') {
-    img = game.sprites.YOUNG_QUEEN;
-    height = 64;
-  }
 
   var obj = {
     img: img,
@@ -4054,7 +4515,7 @@ module.exports = {
   getSegmentHead: getSegmentHead,
   getSegmentTail: getSegmentTail
 };
-},{"../config":1,"../selectors/misc":31,"../selectors/neighbors":32,"../simulation/actionQueue":35,"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41}],35:[function(require,module,exports){
+},{"../config":1,"../selectors/misc":35,"../selectors/neighbors":36,"../simulation/actionQueue":39,"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45}],39:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -4286,7 +4747,7 @@ module.exports = {
   makeAction: makeAction,
   getFrame: getFrame
 };
-},{"../selectors/pheromones":33,"../utils/helpers":39,"../utils/vectors":41}],36:[function(require,module,exports){
+},{"../selectors/pheromones":37,"../utils/helpers":43,"../utils/vectors":45}],40:[function(require,module,exports){
 'use strict';
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -5001,7 +5462,7 @@ module.exports = {
   insertEntityInGrid: insertEntityInGrid,
   removeEntityFromGrid: removeEntityFromGrid
 };
-},{"../config":1,"../entities/makeEntity":15,"../entities/registry":18,"../properties/registry":27,"../selectors/neighbors":32,"../selectors/pheromones":33,"../simulation/pheromones":37,"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41}],37:[function(require,module,exports){
+},{"../config":1,"../entities/makeEntity":18,"../entities/registry":22,"../properties/registry":31,"../selectors/neighbors":36,"../selectors/pheromones":37,"../simulation/pheromones":41,"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45}],41:[function(require,module,exports){
 'use strict';
 
 var _require = require('../utils/vectors'),
@@ -5361,7 +5822,7 @@ module.exports = {
   refreshPheromones: refreshPheromones,
   getBiggestNeighborVal: getBiggestNeighborVal
 };
-},{"../config":1,"../selectors/neighbors":32,"../selectors/pheromones":33,"../utils/gridHelpers":38,"../utils/helpers":39,"../utils/vectors":41}],38:[function(require,module,exports){
+},{"../config":1,"../selectors/neighbors":36,"../selectors/pheromones":37,"../utils/gridHelpers":42,"../utils/helpers":43,"../utils/vectors":45}],42:[function(require,module,exports){
 'use strict';
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -5497,7 +5958,7 @@ module.exports = {
   getEntityPositions: getEntityPositions,
   entityInsideGrid: entityInsideGrid
 };
-},{"../config":1,"../utils/helpers":39,"../utils/vectors":41}],39:[function(require,module,exports){
+},{"../config":1,"../utils/helpers":43,"../utils/vectors":45}],43:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5680,7 +6141,7 @@ module.exports = {
   forEachObj: forEachObj,
   filterObj: filterObj
 };
-},{"./vectors":41}],40:[function(require,module,exports){
+},{"./vectors":45}],44:[function(require,module,exports){
 "use strict";
 
 var floor = Math.floor,
@@ -5735,7 +6196,7 @@ module.exports = {
   oneOf: oneOf,
   weightedOneOf: weightedOneOf
 };
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -5934,4 +6395,4 @@ module.exports = {
   rotate: rotate,
   abs: abs
 };
-},{}]},{},[26]);
+},{}]},{},[30]);

@@ -31,6 +31,11 @@ const Entities = {
   AGENT: require('./agent.js'),
   TOKEN: require('./token.js'),
 
+  PLAYER: require('./player.js'),
+  DRILL: require('./drill.js'),
+  BULLDOZER: require('./bulldozer.js'),
+  DUMPTRUCK: require('./dumptruck.js'),
+
   BASIC_TURRET: require('./basicTurret.js'),
   FAST_TURRET: require('./turret.js'),
 
