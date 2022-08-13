@@ -21,6 +21,40 @@ var config = {
 
   audioFiles: [{ path: 'audio/Song Oct. 9.wav', type: 'wav' }],
 
+  imageFiles: {
+    'URANIUM': './img/URANIUM.png',
+    'DIRT': './img/DIRT.png',
+    'IRON': './img/IRON.png',
+    'STEEL': './img/STEEL.png',
+    'COAL': './img/COAL.png',
+    'HOT_COAL': './img/HOT_COAL.png',
+    'STONE': './img/STONE.png',
+    'SULPHUR': './img/SULPHUR.png',
+    'ICE': './img/ICE.png',
+
+    'MISSILE': './img/Missile2.png',
+    'NUKE_MISSILE': './img/NukeMissile1.png',
+    'BUNKER_BUSTER': './img/BunkerBuster1.png',
+    'BASIC_TURRET': './img/Basic_turret1.png',
+    'FAST_TURRET': './img/Fast_turret1.png',
+    'LASER_TURRET': './img/Laser_turret.png',
+    'BASE': './img/Base1.png',
+
+    'PHEROMONE': './img/Pheromones.png',
+
+    'ALERT': './img/Exclamation1.png',
+    'WANDER': './img/Ellipsis1.png',
+    'QUESTION': './img/Question1.png',
+    'MALE': './img/Male1.png',
+    'FEMALE': './img/Female1.png',
+
+    'ANT': './img/Ant2.png',
+    'WORM': './img/Worm1.png',
+
+    'FLOOR_TILE': './img/FloorTile1.png',
+    'SKYLINE': './img/Skyline1.png'
+  },
+
   dispersingPheromoneUpdateRate: 6,
   gravity: -100,
 

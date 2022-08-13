@@ -2,6 +2,10 @@
 - - - - - - - FIX - - - - - - - -
   - remove TURBINE from pheromoneWorker
   - pheromoneWorker appears to not update after reset in level editor
+  - Healthbars should be renderable on anything
+    - maxHP lives on config as separate property
+    - shouldDisplayHP property
+    - orient relative to entity
 
 
 Game Engine Base Components:

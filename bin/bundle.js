@@ -21,6 +21,40 @@ var config = {
 
   audioFiles: [{ path: 'audio/Song Oct. 9.wav', type: 'wav' }],
 
+  imageFiles: {
+    'URANIUM': './img/URANIUM.png',
+    'DIRT': './img/DIRT.png',
+    'IRON': './img/IRON.png',
+    'STEEL': './img/STEEL.png',
+    'COAL': './img/COAL.png',
+    'HOT_COAL': './img/HOT_COAL.png',
+    'STONE': './img/STONE.png',
+    'SULPHUR': './img/SULPHUR.png',
+    'ICE': './img/ICE.png',
+
+    'MISSILE': './img/Missile2.png',
+    'NUKE_MISSILE': './img/NukeMissile1.png',
+    'BUNKER_BUSTER': './img/BunkerBuster1.png',
+    'BASIC_TURRET': './img/Basic_turret1.png',
+    'FAST_TURRET': './img/Fast_turret1.png',
+    'LASER_TURRET': './img/Laser_turret.png',
+    'BASE': './img/Base1.png',
+
+    'PHEROMONE': './img/Pheromones.png',
+
+    'ALERT': './img/Exclamation1.png',
+    'WANDER': './img/Ellipsis1.png',
+    'QUESTION': './img/Question1.png',
+    'MALE': './img/Male1.png',
+    'FEMALE': './img/Female1.png',
+
+    'ANT': './img/Ant2.png',
+    'WORM': './img/Worm1.png',
+
+    'FLOOR_TILE': './img/FloorTile1.png',
+    'SKYLINE': './img/Skyline1.png'
+  },
+
   dispersingPheromoneUpdateRate: 6,
   gravity: -100,
 
@@ -9506,7 +9540,7 @@ var initGameOverSystem = function initGameOverSystem(store) {
   var dispatch = store.dispatch;
 
   var time = -1;
-  store.subscribe(function () {
+  return store.subscribe(function () {
     var state = store.getState();
     var game = state.game;
 
@@ -9772,7 +9806,7 @@ var initMissileAttackSystem = function initMissileAttackSystem(store) {
   var dispatch = store.dispatch;
 
   var time = -1;
-  store.subscribe(function () {
+  return store.subscribe(function () {
     var state = store.getState();
     var game = state.game;
 
@@ -10240,7 +10274,7 @@ var initRainSystem = function initRainSystem(store) {
   var dispatch = store.dispatch;
 
   var time = -1;
-  store.subscribe(function () {
+  return store.subscribe(function () {
     var state = store.getState();
     var game = state.game;
 
@@ -10277,43 +10311,18 @@ module.exports = { initRainSystem: initRainSystem };
 },{"../config":1,"../simulation/pheromones":62,"../utils/stochastic":107}],71:[function(require,module,exports){
 'use strict';
 
+var _require = require('../config'),
+    config = _require.config;
+
 var initSpriteSheetSystem = function initSpriteSheetSystem(store) {
   // TODO: don't load sprites if they're already loaded
   var dispatch = store.dispatch;
 
   var state = store.getState();
 
-  loadSprite(dispatch, state, 'URANIUM', './img/URANIUM.png');
-  loadSprite(dispatch, state, 'DIRT', './img/DIRT.png');
-  loadSprite(dispatch, state, 'IRON', './img/IRON.png');
-  loadSprite(dispatch, state, 'STEEL', './img/STEEL.png');
-  loadSprite(dispatch, state, 'COAL', './img/COAL.png');
-  loadSprite(dispatch, state, 'HOT_COAL', './img/HOT_COAL.png');
-  loadSprite(dispatch, state, 'STONE', './img/STONE.png');
-  loadSprite(dispatch, state, 'SULPHUR', './img/SULPHUR.png');
-  loadSprite(dispatch, state, 'ICE', './img/ICE.png');
-
-  loadSprite(dispatch, state, 'MISSILE', './img/Missile2.png');
-  loadSprite(dispatch, state, 'NUKE_MISSILE', './img/NukeMissile1.png');
-  loadSprite(dispatch, state, 'BUNKER_BUSTER', './img/BunkerBuster1.png');
-  loadSprite(dispatch, state, 'BASIC_TURRET', './img/Basic_turret1.png');
-  loadSprite(dispatch, state, 'FAST_TURRET', './img/Fast_turret1.png');
-  loadSprite(dispatch, state, 'LASER_TURRET', './img/Laser_turret.png');
-  loadSprite(dispatch, state, 'BASE', './img/Base1.png');
-
-  loadSprite(dispatch, state, 'PHEROMONE', './img/Pheromones.png');
-
-  loadSprite(dispatch, state, 'ALERT', './img/Exclamation1.png');
-  loadSprite(dispatch, state, 'WANDER', './img/Ellipsis1.png');
-  loadSprite(dispatch, state, 'QUESTION', './img/Question1.png');
-  loadSprite(dispatch, state, 'MALE', './img/Male1.png');
-  loadSprite(dispatch, state, 'FEMALE', './img/Female1.png');
-
-  loadSprite(dispatch, state, 'ANT', './img/Ant2.png');
-  loadSprite(dispatch, state, 'WORM', './img/Worm1.png');
-
-  loadSprite(dispatch, state, 'FLOOR_TILE', './img/FloorTile1.png');
-  loadSprite(dispatch, state, 'SKYLINE', './img/Skyline1.png');
+  for (var sprite in config.imageFiles) {
+    loadSprite(dispatch, state, sprite, config.imageFiles[sprite]);
+  }
 };
 
 var loadSprite = function loadSprite(dispatch, state, name, src) {
@@ -10334,7 +10343,7 @@ var loadSprite = function loadSprite(dispatch, state, name, src) {
 };
 
 module.exports = { initSpriteSheetSystem: initSpriteSheetSystem };
-},{}],72:[function(require,module,exports){
+},{"../config":1}],72:[function(require,module,exports){
 'use strict';
 
 var levels = require('../levels/levels');
@@ -11577,12 +11586,17 @@ function Game(props) {
   useEffect(function () {
     initKeyboardControlsSystem(store);
     // initSpriteSheetSystem(store);
-    initGameOverSystem(store);
+    var unSubGameOver = initGameOverSystem(store);
     initPheromoneWorkerSystem(store);
-    initMissileAttackSystem(store);
-    initRainSystem(store);
+    var unSubMissiles = initMissileAttackSystem(store);
+    var unSubRain = initRainSystem(store);
     // initUpgradeSystem(store);
     registerHotkeys(dispatch);
+    return function () {
+      unSubGameOver();
+      unSubMissiles();
+      unSubRain();
+    };
   }, [gameID]);
 
   useEffect(function () {
@@ -13593,7 +13607,7 @@ function playLevel(store, levelName, setLoadingProgress, setIsLoaded) {
       progress = state.game.loadingProgress;
       setLoadingProgress(progress);
     }
-    if (progress < 100) {
+    if (progress < 100 || Object.keys(state.sprites).length < Object.keys(globalConfig.config.imageFiles).length) {
       setTimeout(checkLoading, 100);
     } else {
       setIsLoaded(true);

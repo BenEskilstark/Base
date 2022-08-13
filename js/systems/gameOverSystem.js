@@ -21,7 +21,7 @@ const {useState} = React;
 const initGameOverSystem = (store) => {
   const {dispatch} = store;
   let time = -1;
-  store.subscribe(() => {
+  return store.subscribe(() => {
     const state = store.getState();
     const {game} = state;
     if (!game) return;

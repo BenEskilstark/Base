@@ -59,12 +59,17 @@ function Game(props: Props): React.Node {
   useEffect(() => {
     initKeyboardControlsSystem(store);
     // initSpriteSheetSystem(store);
-    initGameOverSystem(store);
+    const unSubGameOver = initGameOverSystem(store);
     initPheromoneWorkerSystem(store);
-    initMissileAttackSystem(store);
-    initRainSystem(store);
+    const unSubMissiles = initMissileAttackSystem(store);
+    const unSubRain = initRainSystem(store);
     // initUpgradeSystem(store);
     registerHotkeys(dispatch);
+    return () => {
+      unSubGameOver();
+      unSubMissiles();
+      unSubRain();
+    }
   }, [gameID]);
 
   useEffect(() => {
